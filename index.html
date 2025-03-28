@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Question {{ numero }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Question {{ numero }} :</h1>
+        <p class="question">{{ question }}</p>
+
+        <!-- Affichage du message de bonne ou mauvaise réponse -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-messages">
+              {% for category, message in messages %}
+                <p class="{{ category }}">{{ message }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <h3>Choisissez la bonne réponse :</h3>
+        <form method="POST" action="{{ url_for('verifier_reponse', numero=numero) }}">
+            <ul class="reponses">
+                <li>
+                    <input type="radio" id="rep1" value="{{ reponses[0] }}" name="choix">
+                    <label class="radio-container" for="rep1">{{ reponses[0] }}</label>
+                </li>
+                <li>
+                    <input type="radio" id="rep2" value="{{ reponses[1] }}" name="choix">
+                    <label class="radio-container" for="rep2">{{ reponses[1] }}</label>
+                </li>
+                <li>
+                    <input type="radio" id="rep3" value="{{ reponses[2] }}" name="choix">
+                    <label class="radio-container" for="rep3">{{ reponses[2] }}</label>
+                </li>
+                <li>
+                    <input type="radio" id="rep4" value="{{ reponses[3] }}" name="choix">
+                    <label class="radio-container" for="rep4">{{ reponses[3] }}</label>
+                </li>
+            </ul>
+            <button type="submit" class="btn-submit">Valider</button>
+        </form>
+    </div>
+</body>
+</html>
