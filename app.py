@@ -3,32 +3,23 @@ import sqlite3
 import random
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"  # Nécessaire pour utiliser les messages flash
+app.secret_key = "supersecretkey"  
 
-# Fonction pour récupérer une question
 def get_question(numero_question):
     conn = sqlite3.connect("mabase.db")
     cursor = conn.cursor()
     cursor.execute("SELECT question FROM QUIZZ1 WHERE id=? AND langue='fr'", (numero_question,))
     question = cursor.fetchone()
     conn.close()
-    return question
+    return question[0] if question else None
 
-# Fonction pour récupérer les réponses
 def get_reponses(numero_question):
     conn = sqlite3.connect("mabase.db")
     cursor = conn.cursor()
     cursor.execute("SELECT rep1, rep2, rep3, rep4 FROM QUIZZ1 WHERE id=? AND langue='fr'", (numero_question,))
     reponses = cursor.fetchone()
     conn.close()
-    return reponses
-
-# Fonction pour mélanger les réponses
-def melanger_reponses(reponses):
-    bonne_reponse = reponses[0]
-    liste_reponse = list(reponses)
-    random.shuffle(liste_reponse)
-    return liste_reponse, bonne_reponse
+    return list(reponses) if reponses else None
 
 @app.route("/")
 def index():
@@ -37,47 +28,38 @@ def index():
 @app.route("/question/<int:numero>/")
 def question_page(numero):
     question = get_question(numero)
-    if question is None:
-        return print("Aucune question trouvée")
-
     reponses = get_reponses(numero)
-    if reponses is None:
-        return print("Aucune réponse trouvée")
-
-    reponses, bonne_reponse = melanger_reponses(reponses)
-    return render_template("index.html", question=question[0], reponses=reponses, numero=numero)
+    bonne_reponse = reponses[0]
+    reponses_melangees = reponses.copy()
+    random.shuffle(reponses_melangees)
+    return render_template("index.html", question=question, reponses=reponses_melangees, numero=numero, bonne_reponse=bonne_reponse)
 
 @app.route("/verifier/<int:numero>/", methods=["POST"])
 def verifier_reponse(numero):
-    # Vérifier si la question existe
     question = get_question(numero)
-    if question is None:
-        return f"Aucune question trouvée pour l'ID {numero}", 404
-
     reponses = get_reponses(numero)
-    if reponses is None:
-        return f"Aucune réponse trouvée pour l'ID {numero}", 404
 
-    _, bonne_reponse = melanger_reponses(reponses)
+    if question is None or reponses is None:
+        flash("Fin du quiz !", "info")
+        return redirect(url_for('fin_quiz')) 
     
-    # Récupérer la réponse soumise par l'utilisateur
+    bonne_reponse = reponses[0]
     reponse_utilisateur = request.form.get('choix')
-    
-    # Vérifier si c'est la bonne réponse
+
+
     if reponse_utilisateur == bonne_reponse:
-        flash("Bravo ! C'était la bonne réponse.", "success")
+        flash(f"Bravo ! {bonne_reponse} était la bonne réponse.", "success")
     else:
         flash(f"Dommage ! La bonne réponse était {bonne_reponse}.", "error")
 
-    # Passer à la question suivante
-    prochaine_question = numero + 1
-    question_suivante = get_question(prochaine_question)
+    # Redirection vers la page de réponse
+    return redirect(url_for('afficher_reponse', numero=numero, question=question, reponse=bonne_reponse))
 
-    # Si la prochaine question existe, rediriger vers elle
-    if question_suivante:
-        return redirect(url_for('question_page', numero=prochaine_question))
-    else:
-        return render_template("fin_quiz.html", message="Fin du quiz !")
+
+@app.route("/reponse/<int:numero>/")
+def afficher_reponse(numero):
+    return render_template("reponse.html", numero=numero, question=request.args.get('question'), reponse=request.args.get('reponse'))
+
 
 if __name__ == "__main__":
     app.run(debug=True)

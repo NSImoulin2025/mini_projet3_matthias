@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz - Question {{ numero }}</title>
+    <title>Quiz - Réponse {{ numero }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="quiz-container">
         <h1>Question {{ numero }} :</h1>
-        <p class="question">{{ question }}</p>
+        <p class="question"> {{ question }}</p>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
@@ -21,17 +21,9 @@
           {% endif %}
         {% endwith %}
 
-        <h3>Choisissez la bonne réponse :</h3>
-        <form method="POST" action="{{ url_for('verifier_reponse', numero=numero) }}">
-            <ul class="reponses">
-                {% for rep in reponses %}
-                <li>
-                    <input type="radio" id="rep{{ loop.index }}" value="{{ rep }}" name="choix" required>
-                    <label class="radio-container" for="rep{{ loop.index }}">{{ rep }}</label>
-                </li>
-                {% endfor %}
-            </ul>
-            <button type="submit" class="btn-submit">Valider</button>
+        <!-- Bouton pour aller à la question suivante -->
+        <form action="{{ url_for('question_page', numero=numero+1) }}" method="get">
+            <button type="submit" class="btn-suivant">Suivant</button>
         </form>
     </div>
 </body>
