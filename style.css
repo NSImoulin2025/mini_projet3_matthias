@@ -15,7 +15,6 @@ body {
     background-color: #fff;
     padding: 20px 40px;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 600px;
     text-align: center;
@@ -70,22 +69,3 @@ input[type="radio"]:checked + .radio-container {
     border-color: #4c63b6;
 }
 
-/* Effet hover */
-.radio-container:hover {
-    background-color: #ececec;
-}
-
-.btn-submit {
-    font-size: 18px;       /* Augmenter la taille de la police */
-    padding: 15px 30px;    /* Augmenter le padding pour agrandir le bouton */
-    background-color: #4c63b6;  /* Couleur de fond */
-    color: white;          /* Couleur du texte */
-    border: none;          /* Retirer la bordure */
-    border-radius: 5px;    /* Arrondir les coins */
-    cursor: pointer;       /* Changer le curseur quand on survole */
-    transition: background-color 0.3s;  /* Animation de transition */
-}
-
-.btn-submit:hover {
-    background-color: #3a4f94;  /* Couleur de fond au survol */
-}
