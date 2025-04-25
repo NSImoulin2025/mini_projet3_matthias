@@ -1,20 +1,18 @@
 import sqlite3
 import csv
 
-def insert_into(curseur, fic_csv, nom_table, ind_int):
-    with open("quizz_nsi.csv") as fh:
-        fh.readline()
-        lecteur_ligne = csv.reader(fh, delimiter=";")
-        for tab_ligne in lecteur_ligne:
-            for indice in ind_int:
-                tab_ligne[indice] = int(tab_ligne[indice])
-            commSQL = f"INSERT INTO {nom_table} VALUES {tuple(tab_ligne)}"
-            try:
-                curseur.execute(commSQL)
-            except sqlite3.IntegrityError:
-                print("clé primaire existante")
-
 def creation_table():
+    """créer la base de donnée à l'aide d'un csv
+    Précondition :
+    fichier non vide
+
+    Paramètres:
+    aucuns
+
+    Renvoi :
+    pas de return
+
+    creer la datbase"""
     conn = sqlite3.connect("mabase.db")
     curseur = conn.cursor()
     
@@ -33,7 +31,7 @@ def creation_table():
     );
     """)
 
-    with open("quizz_nsi.csv", newline='', encoding="utf-8") as fh:
+    with open("quizz_nsi_linux.csv", newline='', encoding="utf-8") as fh:
         descripteur = csv.DictReader(fh, delimiter=";")  # Utilisation du bon délimiteur
         for dico in descripteur:
             t = tuple(dico.values())
